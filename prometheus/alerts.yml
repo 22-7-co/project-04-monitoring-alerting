@@ -1,0 +1,539 @@
+# Prometheus 告警规则
+#
+# 本文件定义了 Prometheus 周期性评估的告警规则。
+# 当条件满足时，告警会发送到 Alertmanager 进行路由。
+#
+# 学习目标：
+# - 为告警编写 PromQL 查询
+# - 理解告警规则语法（expr、for、labels、annotations）
+# - 设置合理的告警阈值
+# - 设计可执行的告警
+#
+# 参考文档：
+# - https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+# - https://prometheus.io/docs/practices/alerting/
+
+# =============================================================================
+# 告警规则语法
+# =============================================================================
+
+# 基本结构：
+# groups:
+#   - name: <group_name>
+#     interval: <evaluation_interval>
+#     rules:
+#       - alert: <alert_name>
+#         expr: <promql_expression>
+#         for: <duration>
+#         labels:
+#           severity: <critical|warning|info>
+#         annotations:
+#           summary: "<short_description>"
+#           description: "<detailed_description>"
+#           runbook_url: "<link_to_runbook>"
+
+
+# =============================================================================
+# 基础设施告警
+# =============================================================================
+
+groups:
+  - name: infrastructure_alerts
+    interval: 30s  # 每 30 秒评估一次
+    rules:
+
+      # -----------------------------------------------------------------------
+      # CPU 使用率过高告警
+      # -----------------------------------------------------------------------
+
+      # TODO：创建 CPU 使用率过高告警
+      # 触发条件：CPU 使用率 > 80% 且持续 5 分钟
+      #
+      # - alert: HighCPUUsage
+      #   expr: |
+      #     100 - (avg by (instance) (
+      #       rate(node_cpu_seconds_total{mode="idle"}[5m])
+      #     ) * 100) > 80
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "{{ $labels.instance }} CPU 使用率过高"
+      #     description: |
+      #       {{ $labels.instance }} 的 CPU 使用率为 {{ $value | humanizePercentage }}。
+      #       当前阈值：80%
+      #       持续时间：5 分钟
+      #     runbook_url: "https://runbooks.example.com/infrastructure/high-cpu"
+      #
+      # PromQL 说明：
+      # - node_cpu_seconds_total{mode="idle"}：CPU 空闲时间
+      # - rate()[5m]：计算 5 分钟窗口内的每秒变化率
+      # - avg by (instance)：对该实例所有 CPU 核求平均
+      # - 100 - (... * 100)：转换为 CPU 使用率百分比
+      # - > 80：超过 80% 即触发告警
+
+
+      # -----------------------------------------------------------------------
+      # 内存使用率过高告警
+      # -----------------------------------------------------------------------
+
+      # TODO：创建内存使用率过高告警
+      # 触发条件：内存使用率 > 85% 且持续 5 分钟
+      #
+      # - alert: HighMemoryUsage
+      #   expr: |
+      #     (1 - (
+      #       node_memory_MemAvailable_bytes /
+      #       node_memory_MemTotal_bytes
+      #     )) * 100 > 85
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "{{ $labels.instance }} 内存使用率过高"
+      #     description: |
+      #       内存使用率为 {{ $value | humanizePercentage }}。
+      #       可用内存：{{ query "node_memory_MemAvailable_bytes" | first | value | humanizeBytes }}
+      #       总内存：{{ query "node_memory_MemTotal_bytes" | first | value | humanizeBytes }}
+
+
+      # -----------------------------------------------------------------------
+      # 磁盘空间不足告警
+      # -----------------------------------------------------------------------
+
+      # TODO：创建磁盘空间不足的严重告警
+      # 触发条件：磁盘剩余空间 < 15%
+      #
+      # - alert: LowDiskSpace
+      #   expr: |
+      #     (node_filesystem_avail_bytes{mountpoint="/"} /
+      #      node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+      #   for: 5m
+      #   labels:
+      #     severity: critical
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "{{ $labels.instance }} 磁盘空间不足"
+      #     description: |
+      #       {{ $labels.mountpoint }} 的剩余磁盘空间为 {{ $value | humanizePercentage }}。
+      #       可用：{{ query "node_filesystem_avail_bytes{mountpoint='/'}" | first | value | humanizeBytes }}
+      #       总量：{{ query "node_filesystem_size_bytes{mountpoint='/'}" | first | value | humanizeBytes }}
+      #       处理建议：立即清理日志或扩容存储。
+
+
+      # -----------------------------------------------------------------------
+      # 服务不可用告警
+      # -----------------------------------------------------------------------
+
+      # TODO：当服务不可达时创建严重告警
+      # 触发条件：目标持续 2 分钟不可达
+      #
+      # - alert: ServiceDown
+      #   expr: up == 0
+      #   for: 2m
+      #   labels:
+      #     severity: critical
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "服务 {{ $labels.job }} 不可用"
+      #     description: |
+      #       {{ $labels.instance }} 上的 {{ $labels.job }} 已持续超过 2 分钟不可达。
+      #       可能原因：
+      #       - 服务崩溃
+      #       - 网络故障
+      #       - 容器/Pod 失败
+      #       处理建议：检查服务日志并在必要时重启服务。
+
+
+# =============================================================================
+# 应用告警
+# =============================================================================
+
+  - name: application_alerts
+    interval: 30s
+    rules:
+
+      # -----------------------------------------------------------------------
+      # 错误率过高告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为高错误率创建严重告警
+      # 触发条件：5xx 错误率 > 5% 且持续 5 分钟
+      #
+      # - alert: HighErrorRate
+      #   expr: |
+      #     (
+      #       rate(http_requests_total{status=~"5.."}[5m]) /
+      #       rate(http_requests_total[5m])
+      #     ) * 100 > 5
+      #   for: 5m
+      #   labels:
+      #     severity: critical
+      #     component: application
+      #   annotations:
+      #     summary: "检测到高错误率"
+      #     description: |
+      #       当前错误率为 {{ $value | humanizePercentage }}。
+      #       每秒错误请求数：{{ query "rate(http_requests_total{status=~\"5..\"}[5m])" | first | value | humanize }}
+      #       每秒总请求数：{{ query "rate(http_requests_total[5m])" | first | value | humanize }}
+      #
+      # PromQL 说明：
+      # - http_requests_total{status=~"5.."}：5xx 错误请求数
+      # - status=~"5.."：正则匹配 500-599
+      # - rate()[5m]：5 分钟窗口内每秒请求率
+      # - 二者相除得到错误占比，*100 转为百分比
+
+
+      # -----------------------------------------------------------------------
+      # 高延迟告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为高延迟创建 warning 告警
+      # 触发条件：P95 延迟 > 1 秒且持续 5 分钟
+      #
+      # - alert: HighLatency
+      #   expr: |
+      #     histogram_quantile(0.95,
+      #       rate(http_request_duration_seconds_bucket[5m])
+      #     ) > 1
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: application
+      #   annotations:
+      #     summary: "检测到较高的 P95 延迟"
+      #     description: |
+      #       P95 延迟为 {{ $value | humanizeDuration }}。
+      #       这意味着 95% 的请求在 {{ $value }}s 内完成，
+      #       但仍有 5% 的请求更慢。
+      #
+      # histogram_quantile 说明：
+      # - 0.95：第 95 百分位
+      # - 依赖 Histogram 产出的 _bucket 指标
+      # - 返回 95% 观测值低于该值的阈值
+
+
+      # -----------------------------------------------------------------------
+      # 吞吐过低告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为异常低流量创建 info 告警
+      # 触发条件：请求速率 < 1 req/s 且持续 10 分钟
+      #
+      # - alert: LowThroughput
+      #   expr: |
+      #     rate(http_requests_total[5m]) < 1
+      #   for: 10m
+      #   labels:
+      #     severity: info
+      #     component: application
+      #   annotations:
+      #     summary: "请求吞吐较低"
+      #     description: |
+      #       当前请求速率为 {{ $value | humanize }} 请求/秒。
+      #       这可能是预期情况（低峰时段），也可能说明
+      #       负载均衡或客户端连接存在问题。
+
+
+      # -----------------------------------------------------------------------
+      # 响应时间过高（P99）
+      # -----------------------------------------------------------------------
+
+      # TODO：为超慢请求创建 warning 告警
+      # 触发条件：P99 延迟 > 5 秒
+      #
+      # - alert: VeryHighP99Latency
+      #   expr: |
+      #     histogram_quantile(0.99,
+      #       rate(http_request_duration_seconds_bucket[5m])
+      #     ) > 5
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: application
+      #   annotations:
+      #     summary: "P99 延迟过高（{{ $value }}s）"
+      #     description: |
+      #       有 1% 的请求耗时超过 {{ $value | humanizeDuration }}。
+      #       请检查：
+      #       - 慢数据库查询
+      #       - 等待外部服务超时
+      #       - 资源竞争（CPU、内存）
+
+
+# =============================================================================
+# ML 模型告警
+# =============================================================================
+
+  - name: ml_model_alerts
+    interval: 1m
+    rules:
+
+      # -----------------------------------------------------------------------
+      # 模型准确率下降告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为模型准确率退化创建严重告警
+      # 触发条件：准确率 < 85% 且持续 10 分钟
+      #
+      # - alert: ModelAccuracyDrop
+      #   expr: |
+      #     model_accuracy < 0.85
+      #   for: 10m
+      #   labels:
+      #     severity: critical
+      #     component: ml-model
+      #   annotations:
+      #     summary: "模型准确率已低于阈值"
+      #     description: |
+      #       模型 {{ $labels.model_name }} 当前准确率为 {{ $value | humanizePercentage }}。
+      #       基线：90%
+      #       当前：{{ $value | humanizePercentage }}
+      #
+      #       可能原因：
+      #       - 数据漂移
+      #       - 模型随时间退化
+      #       - 错误的模型发布
+      #       - 数据质量问题
+      #
+      #       处理建议：检查数据漂移指标，并考虑重新训练模型。
+
+
+      # -----------------------------------------------------------------------
+      # 检测到数据漂移告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为数据漂移创建 warning 告警
+      # 触发条件：漂移分数 > 0.5 且持续 5 分钟
+      #
+      # - alert: DataDriftDetected
+      #   expr: |
+      #     data_drift_score > 0.5
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "在 {{ $labels.feature_name }} 中检测到数据漂移"
+      #     description: |
+      #       特征 {{ $labels.feature_name }} 的分布发生变化
+      #       漂移分数：{{ $value }}
+      #       阈值：0.5
+      #
+      #       这表示输入数据分布相较训练数据发生了明显变化，
+      #       可能导致模型性能下降。
+      #
+      #       处理建议：
+      #       1. 分析分布变化
+      #       2. 检查数据流水线
+      #       3. 考虑使用近期数据重新训练模型
+
+
+      # -----------------------------------------------------------------------
+      # 推理延迟过高告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为模型推理缓慢创建 warning 告警
+      # 触发条件：P99 推理耗时 > 500ms 且持续 5 分钟
+      #
+      # - alert: HighInferenceLatency
+      #   expr: |
+      #     histogram_quantile(0.99,
+      #       rate(model_inference_duration_seconds_bucket[5m])
+      #     ) > 0.5
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "模型推理延迟过高"
+      #     description: |
+      #       P99 推理延迟为 {{ $value | humanizeDuration }}。
+      #       目标：< 500ms
+      #       当前：{{ $value }}s
+      #
+      #       可能原因：
+      #       - GPU 显存压力
+      #       - CPU 瓶颈
+      #       - 批大小过大
+      #       - 模型复杂度过高
+      #
+      #       处理建议：对推理进行 profile，优化模型并检查 GPU 利用率。
+
+
+      # -----------------------------------------------------------------------
+      # 预测置信度过低告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为模型置信度过低创建 warning 告警
+      # 触发条件：平均置信度 < 70% 且持续 10 分钟
+      #
+      # - alert: LowPredictionConfidence
+      #   expr: |
+      #     avg_over_time(
+      #       avg(model_prediction_confidence)[10m:]
+      #     ) < 0.7
+      #   for: 10m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "平均预测置信度偏低"
+      #     description: |
+      #       平均预测置信度为 {{ $value | humanizePercentage }}。
+      #
+      #       低置信度可能意味着：
+      #       - 输入超出分布范围
+      #       - 模型不确定性上升
+      #       - 数据质量问题
+      #
+      #       处理建议：检查近期预测结果并核查输入数据质量。
+
+
+      # -----------------------------------------------------------------------
+      # 特征缺失告警
+      # -----------------------------------------------------------------------
+
+      # TODO：为数据质量问题创建告警
+      # 触发条件：每分钟缺失特征请求 > 10 个
+      #
+      # - alert: HighMissingFeatureRate
+      #   expr: |
+      #     rate(missing_features_total[5m]) > 0.167
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "{{ $labels.feature_name }} 的特征缺失率较高"
+      #     description: |
+      #       特征 {{ $labels.feature_name }} 在 {{ $value | humanize }} 请求/秒中缺失。
+      #
+      #       这通常表示数据流水线或客户端集成存在问题。
+      #
+      #       处理建议：检查数据流水线并复核客户端集成。
+      #
+      # 说明：0.167 = 每分钟 10 次缺失 / 60 秒
+
+
+# =============================================================================
+# 业务/SLO 告警
+# =============================================================================
+
+  - name: slo_alerts
+    interval: 1m
+    rules:
+
+      # TODO：创建 SLO burn rate 告警
+      # 当 SLO 错误预算消耗过快时触发
+      #
+      # - alert: HighSLOBurnRate
+      #   expr: |
+      #     (
+      #       1 - (
+      #         sum(rate(http_requests_total{status=~"2..|3.."}[1h])) /
+      #         sum(rate(http_requests_total[1h]))
+      #       )
+      #     ) > 0.001
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: slo
+      #   annotations:
+      #     summary: "SLO 错误预算消耗过快"
+      #     description: |
+      #       当前错误率：{{ $value | humanizePercentage }}
+      #       SLO 目标：99.9% 成功率
+      #       月度错误预算：0.1%（43.2 分钟不可用）
+      #
+      #       按当前速率，错误预算预计耗尽时间：
+      #       {{ query "...[calculate time]..." }}
+
+
+# =============================================================================
+# 告警最佳实践
+# =============================================================================
+
+# 1. **可执行告警**
+#    - 每条告警都应触发人工处理动作
+#    - 描述中应明确说明问题
+#    - 在 annotations 中给出下一步操作
+#
+# 2. **严重级别**
+#    - critical：需要立即处理（触发值班通知）
+#    - warning：需在工作时间内排查
+#    - info：提示性告警，通常无需操作
+#
+# 3. **避免告警疲劳**
+#    - 使用 'for' 子句避免抖动告警
+#    - 设置合理阈值
+#    - 对相关告警进行分组
+#    - 基于真实系统行为持续调优
+#
+# 4. **Runbook 链接**
+#    - 建议始终在 annotations 中包含 runbook_url
+#    - Runbook 应包含：
+#      - 快速诊断步骤
+#      - 常见修复方法
+#      - 升级与协作流程
+#
+# 5. **告警测试**
+#    - 每条告警在生产前都要测试
+#    - 验证通知是否到达正确渠道
+#    - 确保描述清晰
+#    - 检查误报/漏报情况
+
+
+# =============================================================================
+# 测试你的告警
+# =============================================================================
+
+# 方法 1：手动测试
+# - 人为触发告警条件
+# - 例如：测试 CPU 告警时运行：stress-ng --cpu 8 --timeout 60s
+# - 在 Prometheus UI 查看告警是否触发：http://localhost:9090/alerts
+
+# 方法 2：PromQL 测试
+# - 在 Prometheus 图形界面测试表达式
+# - 示例：100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+# - 验证结果是否合理
+
+# 方法 3：Alertmanager 测试
+# - 在 Alertmanager 检查告警路由：http://localhost:9093
+# - 验证是否触发了正确接收器
+# - 检查通知送达（邮件、Slack 等）
+
+
+# =============================================================================
+# 常见 PromQL 模式
+# =============================================================================
+
+# 增长速率（适用于 Counter）：
+# rate(metric_total[5m])
+
+# 百分比计算：
+# (metric_a / metric_b) * 100
+
+# 分位数（P50、P95、P99）：
+# histogram_quantile(0.95, rate(metric_bucket[5m]))
+
+# 按标签聚合：
+# sum by (label) (metric)
+# avg by (label) (metric)
+# max by (label) (metric)
+
+# 布尔运算：
+# metric > threshold
+# metric < threshold
+# metric == value
+# metric != value
+
+# 组合条件：
+# metric_a > 10 and metric_b < 5
+# metric_a > 10 or metric_b > 5
+
+# 指标缺失（用于指标中断告警）：
+# absent(metric) == 1
+# Prometheus Alert Rules

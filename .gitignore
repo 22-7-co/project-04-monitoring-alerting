@@ -1,0 +1,90 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Logs and runtime files
+*.log
+logs/
+*.pid
+*.seed
+*.out
+*.err
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.kubeconfig
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Monitoring data (do not version large runtime volumes)
+prometheus/data/
+grafana/data/
+elasticsearch/data/
+logstash/data/
+kibana/data/
+alertmanager/data/
+filebeat/data/
+
+# Optional local service discovery files
+targets/*.tmp.yml
+targets/*.generated.yml
+
+# Terraform (if used for infra)
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Node (if dashboard tooling/scripts are added)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.tgz

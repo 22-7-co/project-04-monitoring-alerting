@@ -1,0 +1,364 @@
+# 监控栈环境变量
+#
+# 此文件包含所有监控服务的配置项。
+# 请将此文件复制为 .env，并按你的环境修改对应值。
+#
+# 用法：
+#   cp .env.example .env
+#   vim .env  # 按你的实际值编辑
+#   docker-compose up -d
+#
+# 学习目标：
+# - 理解基于环境变量的配置方式
+# - 安全管理密钥与凭据
+# - 通过环境变量配置服务
+
+# =============================================================================
+# 通用设置
+# =============================================================================
+
+# TODO: 设置环境名称
+# 可选值：development、staging、production
+# ENVIRONMENT=development
+
+# TODO: 设置服务名称
+# 该值会出现在日志与指标标签中
+# SERVICE_NAME=ml-api
+
+# TODO: 设置日志级别
+# 可选值：DEBUG、INFO、WARNING、ERROR、CRITICAL
+# LOG_LEVEL=INFO
+
+
+# =============================================================================
+# Grafana 配置
+# =============================================================================
+
+# TODO: 设置 Grafana 管理员凭据
+# 警告：生产环境前务必修改默认值！
+# GRAFANA_ADMIN_USER=admin
+# GRAFANA_ADMIN_PASSWORD=admin123
+
+# TODO: 设置 Grafana 服务 URL
+# 用于告警中的外部跳转链接
+# GRAFANA_SERVER_URL=http://localhost:3000
+
+
+# =============================================================================
+# Elasticsearch 配置
+# =============================================================================
+
+# TODO: 设置 Elasticsearch 凭据
+# 当 xpack.security.enabled=true 时需要
+# ELASTIC_USERNAME=elastic
+# ELASTIC_PASSWORD=changeme
+
+# TODO: 设置 Elasticsearch JVM 堆大小
+# 建议：可用内存的 50%，最大 32GB
+# 格式：-Xms<size> -Xmx<size>
+# ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+# TODO: 设置 Elasticsearch 集群名称
+# ES_CLUSTER_NAME=ml-monitoring-cluster
+
+
+# =============================================================================
+# Logstash 配置
+# =============================================================================
+
+# TODO: 设置 Logstash JVM 堆大小
+# 一般应小于 Elasticsearch
+# LS_JAVA_OPTS=-Xms256m -Xmx256m
+
+# TODO: 设置 Logstash 使用的 Elasticsearch 地址
+# ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+
+# =============================================================================
+# Prometheus 配置
+# =============================================================================
+
+# TODO: 设置 Prometheus 保留时间
+# 指标保存时长
+# PROMETHEUS_RETENTION_TIME=30d
+
+# TODO: 设置 Prometheus 保留容量
+# 指标最大存储容量
+# PROMETHEUS_RETENTION_SIZE=10GB
+
+# TODO: 设置 Prometheus 抓取间隔
+# 指标采集频率
+# PROMETHEUS_SCRAPE_INTERVAL=15s
+
+
+# =============================================================================
+# Alertmanager 配置
+# =============================================================================
+
+# TODO: 设置告警用 Slack webhook URL
+# 从 Slack 获取： https://api.slack.com/messaging/webhooks
+# SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
+
+# TODO: 设置告警 Slack 频道
+# SLACK_CHANNEL=#alerts
+
+# TODO: 设置告警邮件配置
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USERNAME=your-email@example.com
+# SMTP_PASSWORD=your-app-password
+# SMTP_FROM=alerts@example.com
+# SMTP_TO=team@example.com
+
+# TODO: 设置 PagerDuty 集成密钥
+# 从 PagerDuty 服务设置中获取
+# PAGERDUTY_SERVICE_KEY=your-pagerduty-integration-key
+
+
+# =============================================================================
+# ML 应用配置
+# =============================================================================
+
+# TODO: 设置模型配置
+# MODEL_NAME=resnet50
+# MODEL_VERSION=v1.2.0
+# MODEL_PATH=/models/resnet50.pth
+
+# TODO: 设置推理配置
+# BATCH_SIZE=32
+# MAX_BATCH_WAIT_MS=100
+# GPU_DEVICE=0
+
+# TODO: 设置 API 配置
+# API_HOST=0.0.0.0
+# API_PORT=5000
+# API_WORKERS=4
+
+
+# =============================================================================
+# 监控阈值
+# =============================================================================
+
+# TODO: 设置告警阈值
+# 这些值决定告警何时触发
+
+# 基础设施阈值
+# CPU_THRESHOLD_WARNING=80
+# CPU_THRESHOLD_CRITICAL=95
+# MEMORY_THRESHOLD_WARNING=85
+# MEMORY_THRESHOLD_CRITICAL=95
+# DISK_THRESHOLD_WARNING=80
+# DISK_THRESHOLD_CRITICAL=90
+
+# 应用阈值
+# ERROR_RATE_THRESHOLD=0.05  # 5% 错误率
+# LATENCY_P95_THRESHOLD=1.0  # 1 秒
+# LATENCY_P99_THRESHOLD=5.0  # 5 秒
+
+# ML 模型阈值
+# MODEL_ACCURACY_THRESHOLD=0.85
+# DRIFT_SCORE_THRESHOLD=0.5
+# INFERENCE_LATENCY_P99_THRESHOLD=0.5  # 500 毫秒
+# LOW_CONFIDENCE_THRESHOLD=0.7
+
+
+# =============================================================================
+# 功能开关（Feature Flags）
+# =============================================================================
+
+# TODO: 启用/禁用监控功能
+# 适用于灰度发布
+
+# 启用指标采集
+# ENABLE_METRICS=true
+
+# 启用日志传输
+# ENABLE_LOGGING=true
+
+# 启用告警
+# ENABLE_ALERTING=true
+
+# 启用漂移检测
+# ENABLE_DRIFT_DETECTION=true
+
+# 启用性能监控
+# ENABLE_PERFORMANCE_MONITORING=true
+
+
+# =============================================================================
+# 开发环境设置
+# =============================================================================
+
+# TODO: 开发环境专用设置
+# 仅在 development 环境使用
+
+# 启用调试模式
+# DEBUG=false
+
+# 模拟外部服务
+# MOCK_EXTERNAL_SERVICES=false
+
+# 使用本地存储替代云存储
+# USE_LOCAL_STORAGE=true
+
+
+# =============================================================================
+# 云服务商配置（可选）
+# =============================================================================
+
+# TODO: AWS 配置（使用 AWS 服务时）
+# AWS_REGION=us-west-2
+# AWS_ACCESS_KEY_ID=your-access-key
+# AWS_SECRET_ACCESS_KEY=your-secret-key
+# AWS_S3_BUCKET=ml-logs-backup
+
+# TODO: GCP 配置（使用 GCP 服务时）
+# GCP_PROJECT_ID=your-project-id
+# GCP_REGION=us-central1
+# GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
+
+# TODO: Azure 配置（使用 Azure 服务时）
+# AZURE_SUBSCRIPTION_ID=your-subscription-id
+# AZURE_RESOURCE_GROUP=ml-monitoring
+# AZURE_STORAGE_ACCOUNT=mllogsstorage
+
+
+# =============================================================================
+# 安全设置
+# =============================================================================
+
+# TODO: 设置安全配置
+
+# API 认证
+# API_KEY=your-secret-api-key
+# JWT_SECRET=your-jwt-secret
+
+# TLS/SSL 配置
+# TLS_ENABLED=false
+# TLS_CERT_PATH=/certs/server.crt
+# TLS_KEY_PATH=/certs/server.key
+
+
+# =============================================================================
+# 高级配置
+# =============================================================================
+
+# TODO: 设置高级选项
+
+# 指标基数上限
+# 防止高基数标签导致指标爆炸
+# MAX_METRIC_CARDINALITY=10000
+
+# 日志采样率
+# 通过采样降低日志量（1.0 = 100%，0.1 = 10%）
+# LOG_SAMPLING_RATE=1.0
+
+# 指标导出间隔
+# 向远端存储推送指标的频率
+# METRICS_EXPORT_INTERVAL_SECONDS=60
+
+
+# =============================================================================
+# 说明与最佳实践
+# =============================================================================
+
+# 1. 永远不要将 .env 提交到版本控制！
+#    请将 .env 加入 .gitignore
+
+# 2. 不同环境使用不同 .env 文件：
+#    .env.development
+#    .env.staging
+#    .env.production
+
+# 3. 生产环境使用密钥管理服务：
+#    - AWS Secrets Manager
+#    - HashiCorp Vault
+#    - Kubernetes Secrets
+#    - Docker Secrets
+
+# 4. 启动时校验环境变量：
+#    - 检查必填变量是否已设置
+#    - 校验格式（URL、数字等）
+#    - 提供清晰错误信息
+
+# 5. 文档化所有变量：
+#    - 控制内容是什么
+#    - 合法值/格式
+#    - 默认值
+#    - 修改后的影响
+
+# 6. 使用强密码：
+#    - 至少 16 位
+#    - 混合字母、数字、符号
+#    - 不使用默认密码
+#    - 定期轮换
+
+# 7. 将密钥与配置分离：
+#    - 密钥：密码、API Key（不要写进代码）
+#    - 配置：阈值、URL（可在代码中）
+
+# 8. 使用环境特定默认值：
+#    - 开发环境：详细日志、较短保留
+#    - 生产环境：精简日志、较长保留
+
+
+# =============================================================================
+# 示例：在 Python 中加载环境变量
+# =============================================================================
+
+# import os
+# from dotenv import load_dotenv
+#
+# # 加载 .env 文件
+# load_dotenv()
+#
+# # 获取变量并设置默认值
+# environment = os.getenv('ENVIRONMENT', 'development')
+# log_level = os.getenv('LOG_LEVEL', 'INFO')
+# grafana_url = os.getenv('GRAFANA_SERVER_URL', 'http://localhost:3000')
+#
+# # 校验必填变量
+# api_key = os.getenv('API_KEY')
+# if not api_key:
+#     raise ValueError("API_KEY environment variable is required")
+#
+# # 类型转换
+# cpu_threshold = float(os.getenv('CPU_THRESHOLD_WARNING', '80'))
+# enable_metrics = os.getenv('ENABLE_METRICS', 'true').lower() == 'true'
+
+
+# =============================================================================
+# 示例：配合 Docker Compose 使用
+# =============================================================================
+
+# Docker Compose 会自动加载同目录下的 .env 文件
+#
+# 在 docker-compose.yml 中：
+# services:
+#   ml-api:
+#     environment:
+#       - LOG_LEVEL=${LOG_LEVEL}
+#       - API_KEY=${API_KEY}
+#       - MODEL_NAME=${MODEL_NAME}
+#
+# 或使用 env_file 指令：
+# services:
+#   ml-api:
+#     env_file:
+#       - .env
+#       - .env.local  # 用本地设置覆盖
+
+
+# =============================================================================
+# 模板结束
+# =============================================================================
+
+# TODO: 复制此文件为 .env 并填写你的实际值
+# cp .env.example .env
+
+# TODO: 更新 .gitignore 以排除 .env
+# echo ".env" >> .gitignore
+
+# TODO: 创建环境专用文件
+# cp .env.example .env.development
+# cp .env.example .env.production
