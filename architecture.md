@@ -90,8 +90,7 @@
                 │  │ 抓取目标       │ │
                 │  ├────────────────┤ │
                 │  │ node-exporter  │ │
-                │  │ app:5000       │ │
-                │  │ ml-api:8000    │ │
+                │  │ ml-api:5000    │ │
                 │  └────────────────┘ │
                 │                      │
                 │  ┌────────────────┐ │
@@ -371,7 +370,7 @@
                 ▼
 2. Prometheus 抓取
    ┌────────────────────────────────┐
-   │ GET http://app:5000/metrics    │
+   │ GET http://ml-api:5000/metrics │
    │                                │
    │ # HELP http_requests_total     │
    │ # TYPE http_requests_total cnt │

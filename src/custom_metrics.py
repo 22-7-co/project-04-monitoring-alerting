@@ -113,20 +113,19 @@ class DataDriftDetector:
             method: 漂移检测方法（'ks'、'psi'、'js'、'chi2'）
         """
         # TODO: 保存参考数据和参数
-        # self.reference_data = reference_data
-        # self.feature_names = feature_names
-        # self.threshold = threshold
-        # self.method = method
-        # self.n_features = reference_data.shape[1]
-        #
-        # # 校验输入
-        # if len(feature_names) != self.n_features:
-        #     raise ValueError(
-        #         f"特征名数量 ({len(feature_names)}) "
-        #         f"必须与特征数 ({self.n_features}) 一致"
-        #     )
+        self.reference_data = reference_data
+        self.feature_names = feature_names
+        self.threshold = threshold
+        self.method = method
+        self.n_features = reference_data.shape[1]
+        
+        # 校验输入
+        if len(feature_names) != self.n_features:
+            raise ValueError(
+                f"特征名数量 ({len(feature_names)}) "
+                f"必须与特征数 ({self.n_features}) 一致"
+            )
 
-        pass  # 实现后删除
 
     def kolmogorov_smirnov_test(
         self,
@@ -150,16 +149,14 @@ class DataDriftDetector:
         # TODO: 使用 scipy.stats.ks_2samp 实现 KS 检验
         #
         # 示例：
-        # statistic, p_value = stats.ks_2samp(reference, current)
+        statistic, p_value = stats.ks_2samp(reference, current)
         #
         # 解释：
         # - statistic 越接近 0，分布越相似
         # - statistic 越接近 1，分布差异越大
         # - p_value < threshold：拒绝原假设（检测到漂移）
         #
-        # return statistic, p_value
-
-        pass  # 实现后删除
+        return statistic, p_value
 
     def population_stability_index(
         self,
@@ -190,24 +187,23 @@ class DataDriftDetector:
         #
         # 步骤：
         # 1. 基于参考数据创建直方图分箱
-        #    ref_hist, bin_edges = np.histogram(reference, bins=bins)
-        #    cur_hist, _ = np.histogram(current, bins=bin_edges)
+        ref_hist, bin_edges = np.histogram(reference, bins=bins)
+        cur_hist, _ = np.histogram(current, bins=bin_edges)
         #
         # 2. 转为占比
-        #    ref_pct = ref_hist / len(reference)
-        #    cur_pct = cur_hist / len(current)
+        ref_pct = ref_hist / len(reference)
+        cur_pct = cur_hist / len(current)
         #
         # 3. 避免除零（加入微小 epsilon）
-        #    epsilon = 1e-10
-        #    ref_pct = np.where(ref_pct == 0, epsilon, ref_pct)
-        #    cur_pct = np.where(cur_pct == 0, epsilon, cur_pct)
+        epsilon = 1e-10
+        ref_pct = np.where(ref_pct == 0, epsilon, ref_pct)
+        cur_pct = np.where(cur_pct == 0, epsilon, cur_pct)
         #
         # 4. 计算 PSI
-        #    psi = np.sum((cur_pct - ref_pct) * np.log(cur_pct / ref_pct))
+        psi = np.sum((cur_pct - ref_pct) * np.log(cur_pct / ref_pct))
         #
-        # return psi
+        return psi
 
-        pass  # 实现后删除
 
     def jensen_shannon_divergence(
         self,
@@ -234,20 +230,19 @@ class DataDriftDetector:
         #
         # 步骤：
         # 1. 创建归一化直方图
-        #    ref_hist, bin_edges = np.histogram(reference, bins=bins, density=True)
-        #    cur_hist, _ = np.histogram(current, bins=bin_edges, density=True)
-        #
+        ref_hist, bin_edges = np.histogram(reference, bins=bins, density=True)
+        cur_hist, _ = np.histogram(current, bins=bin_edges, density=True)
+        
         # 2. 归一化为概率分布
-        #    ref_prob = ref_hist / np.sum(ref_hist)
-        #    cur_prob = cur_hist / np.sum(cur_hist)
-        #
+        ref_prob = ref_hist / np.sum(ref_hist)
+        cur_prob = cur_hist / np.sum(cur_hist)
+        
         # 3. 计算 JS 散度
-        #    from scipy.spatial.distance import jensenshannon
-        #    js_distance = jensenshannon(ref_prob, cur_prob)
-        #
-        # return js_distance
+        from scipy.spatial.distance import jensenshannon
+        js_distance = jensenshannon(ref_prob, cur_prob)
+        
+        return js_distance
 
-        pass  # 实现后删除
 
     def detect_drift(
         self,
@@ -265,55 +260,54 @@ class DataDriftDetector:
         # TODO: 实现全特征漂移检测
         #
         # 伪代码：
-        # results = []
-        #
-        # for i, feature_name in enumerate(self.feature_names):
-        #     reference_feature = self.reference_data[:, i]
-        #     current_feature = current_data[:, i]
-        #
-        #     # 选择检测方法
-        #     if self.method == 'ks':
-        #         statistic, p_value = self.kolmogorov_smirnov_test(
-        #             reference_feature, current_feature
-        #         )
-        #         is_drift = p_value < self.threshold
-        #
-        #     elif self.method == 'psi':
-        #         statistic = self.population_stability_index(
-        #             reference_feature, current_feature
-        #         )
-        #         p_value = None
-        #         is_drift = statistic > 0.25  # PSI 阈值
-        #
-        #     elif self.method == 'js':
-        #         statistic = self.jensen_shannon_divergence(
-        #             reference_feature, current_feature
-        #         )
-        #         p_value = None
-        #         is_drift = statistic > 0.5  # JS 阈值
-        #
-        #     # 构建结果对象
-        #     result = DriftDetectionResult(
-        #         feature_name=feature_name,
-        #         statistic=statistic,
-        #         p_value=p_value,
-        #         is_drift=is_drift,
-        #         test_method=self.method,
-        #         timestamp=datetime.now()
-        #     )
-        #
-        #     results.append(result)
-        #
-        #     # 记录漂移日志
-        #     if is_drift:
-        #         logger.warning(
-        #             f"在 {feature_name} 上检测到漂移："
-        #             f"statistic={statistic:.4f}, p_value={p_value}"
-        #         )
-        #
-        # return results
+        results = []
+        
+        for i, feature_name in enumerate(self.feature_names):
+            reference_feature = self.reference_data[:, i]
+            current_feature = current_data[:, i]
+        
+            # 选择检测方法
+            if self.method == 'ks':
+                statistic, p_value = self.kolmogorov_smirnov_test(
+                    reference_feature, current_feature
+                )
+                is_drift = p_value < self.threshold
+        
+            elif self.method == 'psi':
+                statistic = self.population_stability_index(
+                    reference_feature, current_feature
+                )
+                p_value = None
+                is_drift = statistic > 0.25  # PSI 阈值
+        
+            elif self.method == 'js':
+                statistic = self.jensen_shannon_divergence(
+                    reference_feature, current_feature
+                )
+                p_value = None
+                is_drift = statistic > 0.5  # JS 阈值
+        
+            # 构建结果对象
+            result = DriftDetectionResult(
+                feature_name=feature_name,
+                statistic=statistic,
+                p_value=p_value,
+                is_drift=is_drift,
+                test_method=self.method,
+                timestamp=datetime.now()
+            )
+        
+            results.append(result)
+        
+            # 记录漂移日志
+            if is_drift:
+                logger.warning(
+                    f"在 {feature_name} 上检测到漂移："
+                    f"statistic={statistic:.4f}, p_value={p_value}"
+                )
+        
+        return results
 
-        pass  # 实现后删除
 
     def export_drift_metrics(self, drift_results: List[DriftDetectionResult]):
         """
@@ -324,25 +318,24 @@ class DataDriftDetector:
         """
         # TODO: 更新 Prometheus 漂移指标
         #
-        # for result in drift_results:
-        #     # 更新漂移分数 Gauge
-        #     data_drift_score.labels(
-        #         feature_name=result.feature_name
-        #     ).set(result.statistic)
-        #
-        #     # 写入应用日志（供 Elasticsearch 检索）
-        #     logger.info(
-        #         "漂移检测结果",
-        #         extra={
-        #             'feature_name': result.feature_name,
-        #             'statistic': result.statistic,
-        #             'p_value': result.p_value,
-        #             'is_drift': result.is_drift,
-        #             'method': result.test_method
-        #         }
-        #     )
+        for result in drift_results:
+            # 更新漂移分数 Gauge
+            data_drift_score.labels(
+                feature_name=result.feature_name
+            ).set(result.statistic)
+        
+            # 写入应用日志（供 Elasticsearch 检索）
+            logger.info(
+                "漂移检测结果",
+                extra={
+                    'feature_name': result.feature_name,
+                    'statistic': result.statistic,
+                    'p_value': result.p_value,
+                    'is_drift': result.is_drift,
+                    'method': result.test_method
+                }
+            )
 
-        pass  # 实现后删除
 
 
 # =============================================================================
@@ -381,13 +374,12 @@ class ModelPerformanceMonitor:
             min_samples: 计算指标前所需最小样本数
         """
         # TODO: 初始化监控器
-        # self.model_name = model_name
-        # self.min_samples = min_samples
-        # self.predictions = []
-        # self.ground_truth = []
-        # self.prediction_timestamps = []
+        self.model_name = model_name
+        self.min_samples = min_samples
+        self.predictions = []
+        self.ground_truth = []
+        self.prediction_timestamps = []
 
-        pass  # 实现后删除
 
     def log_prediction(
         self,
@@ -405,15 +397,13 @@ class ModelPerformanceMonitor:
         """
         # TODO: 存储预测结果
         #
-        # self.predictions.append(prediction)
-        # if ground_truth is not None:
-        #     self.ground_truth.append(ground_truth)
-        # self.prediction_timestamps.append(datetime.now())
+        self.predictions.append(prediction)
+        if ground_truth is not None:
+            self.ground_truth.append(ground_truth)
+        self.prediction_timestamps.append(datetime.now())
         #
         # 注意：在生产环境中，你可能需要用数据库保存预测结果，
         # 并与后续到达的真实标签进行匹配
-
-        pass  # 实现后删除
 
     def add_ground_truth(self, prediction_id: str, ground_truth: int):
         """
@@ -432,7 +422,11 @@ class ModelPerformanceMonitor:
         # 2. 存储真实标签
         # 3. 更新指标
 
-        pass  # 实现后删除
+        self.ground_truth.append(ground_truth)
+        self.prediction_timestamps.append(datetime.now())
+        #
+        # 注意：在生产环境中，你可能需要用数据库保存预测结果，
+        # 并与后续到达的真实标签进行匹配
 
     def calculate_metrics(self) -> Optional[ModelPerformanceMetrics]:
         """
@@ -443,60 +437,59 @@ class ModelPerformanceMonitor:
         """
         # TODO: 实现指标计算
         #
-        # if len(self.ground_truth) < self.min_samples:
-        #     logger.warning(
-        #         f"样本不足，无法计算指标 "
-        #         f"({len(self.ground_truth)} / {self.min_samples})"
-        #     )
-        #     return None
-        #
-        # # 导入 sklearn 指标
-        # from sklearn.metrics import (
-        #     accuracy_score,
-        #     precision_score,
-        #     recall_score,
-        #     f1_score
-        # )
-        #
-        # # 计算指标
-        # accuracy = accuracy_score(self.ground_truth, self.predictions)
-        # precision = precision_score(
-        #     self.ground_truth,
-        #     self.predictions,
-        #     average='weighted'
-        # )
-        # recall = recall_score(
-        #     self.ground_truth,
-        #     self.predictions,
-        #     average='weighted'
-        # )
-        # f1 = f1_score(
-        #     self.ground_truth,
-        #     self.predictions,
-        #     average='weighted'
-        # )
-        #
-        # metrics = ModelPerformanceMetrics(
-        #     accuracy=accuracy,
-        #     precision=precision,
-        #     recall=recall,
-        #     f1_score=f1,
-        #     sample_count=len(self.ground_truth),
-        #     timestamp=datetime.now()
-        # )
-        #
-        # # 更新 Prometheus 指标
-        # model_accuracy.labels(model_name=self.model_name).set(accuracy)
-        #
-        # # 记录日志
-        # logger.info(
-        #     f"模型性能指标：accuracy={accuracy:.4f}, "
-        #     f"precision={precision:.4f}, recall={recall:.4f}, f1={f1:.4f}"
-        # )
-        #
-        # return metrics
+        if len(self.ground_truth) < self.min_samples:
+            logger.warning(
+                f"样本不足，无法计算指标 "
+                f"({len(self.ground_truth)} / {self.min_samples})"
+            )
+            return None
+        
+        # 导入 sklearn 指标
+        from sklearn.metrics import (
+            accuracy_score,
+            precision_score,
+            recall_score,
+            f1_score
+        )
+        
+        # 计算指标
+        accuracy = accuracy_score(self.ground_truth, self.predictions)
+        precision = precision_score(
+            self.ground_truth,
+            self.predictions,
+            average='weighted'
+        )
+        recall = recall_score(
+            self.ground_truth,
+            self.predictions,
+            average='weighted'
+        )
+        f1 = f1_score(
+            self.ground_truth,
+            self.predictions,
+            average='weighted'
+        )
+        
+        metrics = ModelPerformanceMetrics(
+            accuracy=accuracy,
+            precision=precision,
+            recall=recall,
+            f1_score=f1,
+            sample_count=len(self.ground_truth),
+            timestamp=datetime.now()
+        )
+        
+        # 更新 Prometheus 指标
+        model_accuracy.labels(model_name=self.model_name).set(accuracy)
+        
+        # 记录日志
+        logger.info(
+            f"模型性能指标：accuracy={accuracy:.4f}, "
+            f"precision={precision:.4f}, recall={recall:.4f}, f1={f1:.4f}"
+        )
+        
+        return metrics
 
-        pass  # 实现后删除
 
     def check_degradation(
         self,
@@ -515,25 +508,24 @@ class ModelPerformanceMonitor:
         """
         # TODO: 实现退化检测
         #
-        # if len(self.ground_truth) < self.min_samples:
-        #     return False
-        #
-        # from sklearn.metrics import accuracy_score
-        # current_accuracy = accuracy_score(self.ground_truth, self.predictions)
-        # degradation = baseline_accuracy - current_accuracy
-        #
-        # if degradation > threshold:
-        #     logger.error(
-        #         f"检测到性能退化！"
-        #         f"基线：{baseline_accuracy:.4f}, "
-        #         f"当前：{current_accuracy:.4f}, "
-        #         f"退化幅度：{degradation:.4f}"
-        #     )
-        #     return True
-        #
-        # return False
+        if len(self.ground_truth) < self.min_samples:
+            return False
+        
+        from sklearn.metrics import accuracy_score
+        current_accuracy = accuracy_score(self.ground_truth, self.predictions)
+        degradation = baseline_accuracy - current_accuracy
+        
+        if degradation > threshold:
+            logger.error(
+                f"检测到性能退化！"
+                f"基线：{baseline_accuracy:.4f}, "
+                f"当前：{current_accuracy:.4f}, "
+                f"退化幅度：{degradation:.4f}"
+            )
+            return True
+        
+        return False
 
-        pass  # 实现后删除
 
 
 # =============================================================================
@@ -564,11 +556,10 @@ class ConfidenceAnalyzer:
             window_size: 用于分析的最近预测数量窗口
         """
         # TODO: 初始化分析器
-        # self.window_size = window_size
-        # self.confidences = []
-        # self.correctness = []  # 预测是否正确
+        self.window_size = window_size
+        self.confidences = []
+        self.correctness = []  # 预测是否正确
 
-        pass  # 实现后删除
 
     def log_confidence(self, confidence: float, is_correct: Optional[bool] = None):
         """
@@ -580,16 +571,15 @@ class ConfidenceAnalyzer:
         """
         # TODO: 存储置信度
         #
-        # self.confidences.append(confidence)
-        # if is_correct is not None:
-        #     self.correctness.append(is_correct)
-        #
-        # # 仅保留最近窗口
-        # if len(self.confidences) > self.window_size:
-        #     self.confidences = self.confidences[-self.window_size:]
-        #     self.correctness = self.correctness[-self.window_size:]
+        self.confidences.append(confidence)
+        if is_correct is not None:
+            self.correctness.append(is_correct)
+        
+        # 仅保留最近窗口
+        if len(self.confidences) > self.window_size:
+            self.confidences = self.confidences[-self.window_size:]
+            self.correctness = self.correctness[-self.window_size:]
 
-        pass  # 实现后删除
 
     def get_statistics(self) -> Dict[str, float]:
         """
@@ -600,33 +590,32 @@ class ConfidenceAnalyzer:
         """
         # TODO: 计算统计值
         #
-        # if len(self.confidences) == 0:
-        #     return {}
-        #
-        # confidences_array = np.array(self.confidences)
-        #
-        # stats = {
-        #     'mean': np.mean(confidences_array),
-        #     'median': np.median(confidences_array),
-        #     'std': np.std(confidences_array),
-        #     'min': np.min(confidences_array),
-        #     'max': np.max(confidences_array),
-        #     'p25': np.percentile(confidences_array, 25),
-        #     'p50': np.percentile(confidences_array, 50),
-        #     'p75': np.percentile(confidences_array, 75),
-        #     'p95': np.percentile(confidences_array, 95),
-        #     'count': len(self.confidences)
-        # }
-        #
-        # # 若有真实标签，计算校准分数
-        # if len(self.correctness) > 0:
-        #     # 按置信度分箱比较真实准确率
-        #     # 用于判断高置信度是否对应高准确率
-        #     stats['calibration_score'] = self._calculate_calibration()
-        #
-        # return stats
+        if len(self.confidences) == 0:
+            return {}
+        
+        confidences_array = np.array(self.confidences)
+        
+        stats = {
+            'mean': np.mean(confidences_array),
+            'median': np.median(confidences_array),
+            'std': np.std(confidences_array),
+            'min': np.min(confidences_array),
+            'max': np.max(confidences_array),
+            'p25': np.percentile(confidences_array, 25),
+            'p50': np.percentile(confidences_array, 50),
+            'p75': np.percentile(confidences_array, 75),
+            'p95': np.percentile(confidences_array, 95),
+            'count': len(self.confidences)
+        }
+        
+        # 若有真实标签，计算校准分数
+        if len(self.correctness) > 0:
+            # 按置信度分箱比较真实准确率
+            # 用于判断高置信度是否对应高准确率
+            stats['calibration_score'] = self._calculate_calibration()
+        
+        return stats
 
-        pass  # 实现后删除
 
     def _calculate_calibration(self) -> float:
         """
@@ -642,8 +631,14 @@ class ConfidenceAnalyzer:
         # 这是进阶内容，对初级工程师可选
         #
         # 提示：使用 sklearn.calibration.calibration_curve
-
-        return 0.0
+        from sklearn.calibration import calibration_curve
+        prob_true, prob_pred = calibration_curve(
+            self.correctness,
+            self.confidences,
+            n_bins=10
+        )
+        calibration_score = np.mean((prob_true - prob_pred) ** 2)
+        return calibration_score
 
 
 # =============================================================================
@@ -670,15 +665,14 @@ class DataQualityMonitor:
             expected_schema: 期望 Schema {feature_name: data_type}
         """
         # TODO: 初始化监控器
-        # self.expected_schema = expected_schema
-        # self.issue_counts = {
-        #     'missing': {},
-        #     'out_of_range': {},
-        #     'type_error': {},
-        #     'schema_mismatch': 0
-        # }
+        self.expected_schema = expected_schema
+        self.issue_counts = {
+            'missing': {},
+            'out_of_range': {},
+            'type_error': {},
+            'schema_mismatch': 0
+        }
 
-        pass  # 实现后删除
 
     def validate_request(self, data: Dict) -> Dict[str, List[str]]:
         """
@@ -690,35 +684,44 @@ class DataQualityMonitor:
         Returns:
             发现的问题字典 {issue_type: [feature_names]}
         """
-        # TODO: 实现校验
-        #
-        # issues = {
-        #     'missing': [],
-        #     'type_error': [],
-        #     'out_of_range': []
-        # }
-        #
-        # # 检查缺失特征
-        # for feature_name in self.expected_schema:
-        #     if feature_name not in data:
-        #         issues['missing'].append(feature_name)
-        #         missing_features_total.labels(
-        #             feature_name=feature_name
-        #         ).inc()
-        #
-        # # 检查数据类型
-        # for feature_name, value in data.items():
-        #     expected_type = self.expected_schema.get(feature_name)
-        #     if expected_type and not isinstance(value, eval(expected_type)):
-        #         issues['type_error'].append(feature_name)
-        #
-        # # 检查取值范围（你需要自行定义规则）
-        # # 示例：if 'age' not in range(0, 120):
-        # #     issues['out_of_range'].append('age')
-        #
-        # return issues
+        issues = {
+            'missing': [],
+            'type_error': [],
+            'out_of_range': []
+        }
+        
+        # 检查缺失特征
+        for feature_name in self.expected_schema:
+            if feature_name not in data:
+                issues['missing'].append(feature_name)
+                missing_features_total.labels(
+                    feature_name=feature_name
+                ).inc()
+        
+        # 检查数据类型
+        for feature_name, value in data.items():
+            expected_type = self.expected_schema.get(feature_name)
+            if expected_type and not isinstance(value, eval(expected_type)):
+                issues['type_error'].append(feature_name)
+        
+        # 检查取值范围
+        # 这里只对常见字段举例：你可以根据实际业务需要自定义更多规则
+        # 建议把规则抽到参数或配置中，这里硬编码示例
+        range_rules = {
+            'age': (0, 120),
+            'salary': (0, 1_000_000),
+            'score': (0.0, 1.0)
+        }
+        for feature_name, (min_val, max_val) in range_rules.items():
+            if feature_name in data:
+                value = data[feature_name]
+                # 只对数字做范围判断
+                if isinstance(value, (int, float)):
+                    if not (min_val <= value <= max_val):
+                        issues['out_of_range'].append(feature_name)
+        
+        return issues
 
-        pass  # 实现后删除
 
 
 # =============================================================================
@@ -734,40 +737,39 @@ if __name__ == "__main__":
     # 示例 1：漂移检测
     # print("\n1. 测试漂移检测：")
     # # 生成参考数据
-    # np.random.seed(42)
-    # reference_data = np.random.normal(0, 1, (1000, 3))
-    # feature_names = ['feature_1', 'feature_2', 'feature_3']
-    #
+    np.random.seed(42)
+    reference_data = np.random.normal(0, 1, (1000, 3))
+    feature_names = ['feature_1', 'feature_2', 'feature_3']
+    
     # # 创建检测器
-    # detector = DataDriftDetector(
-    #     reference_data=reference_data,
-    #     feature_names=feature_names,
-    #     threshold=0.05,
-    #     method='ks'
-    # )
+    detector = DataDriftDetector(
+        reference_data=reference_data,
+        feature_names=feature_names,
+        threshold=0.05,
+        method='ks'
+    )
     #
     # # 使用漂移数据测试（均值偏移）
-    # drifted_data = np.random.normal(0.5, 1, (1000, 3))
-    # drift_results = detector.detect_drift(drifted_data)
-    #
-    # for result in drift_results:
-    #     print(f"{result.feature_name}: drift={result.is_drift}, "
-    #           f"statistic={result.statistic:.4f}, p_value={result.p_value:.4f}")
+    drifted_data = np.random.normal(0.5, 1, (1000, 3))
+    drift_results = detector.detect_drift(drifted_data)
+    
+    for result in drift_results:
+        print(f"{result.feature_name}: drift={result.is_drift}, "
+              f"statistic={result.statistic:.4f}, p_value={result.p_value:.4f}")
 
     # 示例 2：性能监控
-    # print("\n2. 测试性能监控：")
-    # monitor = ModelPerformanceMonitor('test_model', min_samples=10)
+    print("\n2. 测试性能监控：")
+    monitor = ModelPerformanceMonitor('test_model', min_samples=10)
     #
     # # 模拟预测
-    # for i in range(20):
-    #     pred = np.random.randint(0, 2)
-    #     truth = np.random.randint(0, 2)
-    #     monitor.log_prediction(pred, truth)
+    for i in range(20):
+        pred = np.random.randint(0, 2)
+        truth = np.random.randint(0, 2)
+        monitor.log_prediction(pred, truth)
     #
     # # 计算指标
-    # metrics = monitor.calculate_metrics()
-    # if metrics:
-    #     print(f"Accuracy: {metrics.accuracy:.4f}")
-    #     print(f"F1 Score: {metrics.f1_score:.4f}")
+    metrics = monitor.calculate_metrics()
+    if metrics:
+        print(f"Accuracy: {metrics.accuracy:.4f}")
+        print(f"F1 Score: {metrics.f1_score:.4f}")
 
-    print("\n请先实现 TODO 并取消注释示例后再测试！")

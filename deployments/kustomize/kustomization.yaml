@@ -1,0 +1,47 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: monitoring-stack
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: prometheus-config
+    files:
+      - prometheus.yml=../../platform/observability/prometheus/prometheus-k8s.yml
+      - alerts.yml=../../platform/observability/prometheus/alerts.yml
+  - name: alertmanager-config
+    files:
+      - alertmanager.yml=../../platform/observability/alertmanager/alertmanager.yml
+  - name: logstash-pipeline-k8s
+    files:
+      - logstash.conf=../../platform/logging/logstash/pipeline-k8s.conf
+  - name: logstash-config-cm
+    files:
+      - logstash.yml=../../platform/logging/logstash/logstash.yml
+  - name: grafana-datasources
+    files:
+      - datasources.yml=../../platform/observability/grafana/datasources.yml
+  - name: grafana-dashboard-provider
+    files:
+      - dashboards.yml=../../platform/observability/grafana/dashboards-provider.yml
+  - name: grafana-dashboard-ml-api
+    files:
+      - ml-api-overview.json=../../platform/observability/grafana/dashboards/ml-api-overview.json
+  - name: filebeat-config
+    files:
+      - filebeat.yml=../../platform/logging/filebeat/filebeat-k8s.yml
+
+resources:
+  - namespace.yaml
+  - rbac-prometheus.yaml
+  - prometheus.yaml
+  - alertmanager.yaml
+  - grafana.yaml
+  - node-exporter.yaml
+  - elasticsearch.yaml
+  - logstash.yaml
+  - kibana.yaml
+  - filebeat.yaml
+  - ml-api.yaml

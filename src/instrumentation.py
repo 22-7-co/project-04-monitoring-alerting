@@ -118,6 +118,7 @@ http_request_duration_seconds = Histogram(
 http_request_size_bytes = Histogram(
     'http_request_size_bytes',
     'HTTP request size in bytes',
+    ['method', 'endpoint'],
     buckets=[100, 1000, 10000, 100000, 1000000, 10000000],
     registry=registry
 )
@@ -297,12 +298,12 @@ network_transmit_bytes_total = Gauge(
 # 如果你的 ML 系统有业务价值，建议跟踪！
 #
 # 示例：
-# business_predictions_total = Counter(
-#     'business_predictions_total',
-#     'Total predictions for paying customers',
-#     ['customer_tier'],
-#     registry=registry
-# )
+business_predictions_total = Counter(
+    'business_predictions_total',
+    'Total predictions for paying customers',
+    ['customer_tier'],
+    registry=registry
+)
 
 
 # =============================================================================
@@ -674,6 +675,6 @@ if __name__ == "__main__":
     print("\n测试步骤：")
     print("1. 实现本文件中的所有 TODO")
     print("2. 运行文件：python instrumentation.py")
-    print("3. 发送请求：curl -X POST http://localhost:5000/predict")
-    print("4. 查看指标：curl http://localhost:5000/metrics")
+    print("3. 发送请求：curl -X POST http://localhost:30500/predict（k8s NodePort）")
+    print("4. 查看指标：curl http://localhost:30500/metrics")
     print("5. 在输出中确认你的自定义指标已出现！")

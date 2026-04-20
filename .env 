@@ -19,15 +19,15 @@
 
 # TODO: 设置环境名称
 # 可选值：development、staging、production
-# ENVIRONMENT=development
+ENVIRONMENT=development
 
 # TODO: 设置服务名称
 # 该值会出现在日志与指标标签中
-# SERVICE_NAME=ml-api
+SERVICE_NAME=ml-api
 
 # TODO: 设置日志级别
 # 可选值：DEBUG、INFO、WARNING、ERROR、CRITICAL
-# LOG_LEVEL=INFO
+LOG_LEVEL=INFO
 
 
 # =============================================================================
@@ -36,12 +36,12 @@
 
 # TODO: 设置 Grafana 管理员凭据
 # 警告：生产环境前务必修改默认值！
-# GRAFANA_ADMIN_USER=admin
-# GRAFANA_ADMIN_PASSWORD=admin123
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=admin123
 
 # TODO: 设置 Grafana 服务 URL
 # 用于告警中的外部跳转链接
-# GRAFANA_SERVER_URL=http://localhost:3000
+GRAFANA_SERVER_URL=http://localhost:3000
 
 
 # =============================================================================
@@ -50,16 +50,16 @@
 
 # TODO: 设置 Elasticsearch 凭据
 # 当 xpack.security.enabled=true 时需要
-# ELASTIC_USERNAME=elastic
-# ELASTIC_PASSWORD=changeme
+ELASTIC_USERNAME=elastic
+ELASTIC_PASSWORD=changeme
 
 # TODO: 设置 Elasticsearch JVM 堆大小
 # 建议：可用内存的 50%，最大 32GB
 # 格式：-Xms<size> -Xmx<size>
-# ES_JAVA_OPTS=-Xms512m -Xmx512m
+ES_JAVA_OPTS=-Xms512m -Xmx512m
 
 # TODO: 设置 Elasticsearch 集群名称
-# ES_CLUSTER_NAME=ml-monitoring-cluster
+ES_CLUSTER_NAME=ml-monitoring-cluster
 
 
 # =============================================================================
@@ -68,10 +68,10 @@
 
 # TODO: 设置 Logstash JVM 堆大小
 # 一般应小于 Elasticsearch
-# LS_JAVA_OPTS=-Xms256m -Xmx256m
+LS_JAVA_OPTS=-Xms256m -Xmx256m
 
 # TODO: 设置 Logstash 使用的 Elasticsearch 地址
-# ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+ELASTICSEARCH_HOSTS=http://elasticsearch:9200
 
 
 # =============================================================================
@@ -80,15 +80,15 @@
 
 # TODO: 设置 Prometheus 保留时间
 # 指标保存时长
-# PROMETHEUS_RETENTION_TIME=30d
+PROMETHEUS_RETENTION_TIME=30d
 
 # TODO: 设置 Prometheus 保留容量
 # 指标最大存储容量
-# PROMETHEUS_RETENTION_SIZE=10GB
+PROMETHEUS_RETENTION_SIZE=10GB
 
 # TODO: 设置 Prometheus 抓取间隔
 # 指标采集频率
-# PROMETHEUS_SCRAPE_INTERVAL=15s
+PROMETHEUS_SCRAPE_INTERVAL=15s
 
 
 # =============================================================================
@@ -97,18 +97,18 @@
 
 # TODO: 设置告警用 Slack webhook URL
 # 从 Slack 获取： https://api.slack.com/messaging/webhooks
-# SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
 
 # TODO: 设置告警 Slack 频道
-# SLACK_CHANNEL=#alerts
+SLACK_CHANNEL=#alerts
 
 # TODO: 设置告警邮件配置
-# SMTP_HOST=smtp.gmail.com
-# SMTP_PORT=587
-# SMTP_USERNAME=your-email@example.com
-# SMTP_PASSWORD=your-app-password
-# SMTP_FROM=alerts@example.com
-# SMTP_TO=team@example.com
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=22-7
+SMTP_PASSWORD=kbwsndbewcpschfb
+SMTP_FROM=x22han7@qq.com
+SMTP_TO=x22han7@qq.com
 
 # TODO: 设置 PagerDuty 集成密钥
 # 从 PagerDuty 服务设置中获取
@@ -120,19 +120,19 @@
 # =============================================================================
 
 # TODO: 设置模型配置
-# MODEL_NAME=resnet50
-# MODEL_VERSION=v1.2.0
-# MODEL_PATH=/models/resnet50.pth
+MODEL_NAME=resnet50
+MODEL_VERSION=v1.2.0
+MODEL_PATH=/models/resnet50.pth
 
 # TODO: 设置推理配置
-# BATCH_SIZE=32
-# MAX_BATCH_WAIT_MS=100
-# GPU_DEVICE=0
+BATCH_SIZE=32
+MAX_BATCH_WAIT_MS=100 
+GPU_DEVICE=0    
 
 # TODO: 设置 API 配置
-# API_HOST=0.0.0.0
-# API_PORT=5000
-# API_WORKERS=4
+API_HOST=0.0.0.0
+API_PORT=5000
+API_WORKERS=4
 
 
 # =============================================================================
@@ -143,23 +143,23 @@
 # 这些值决定告警何时触发
 
 # 基础设施阈值
-# CPU_THRESHOLD_WARNING=80
-# CPU_THRESHOLD_CRITICAL=95
-# MEMORY_THRESHOLD_WARNING=85
-# MEMORY_THRESHOLD_CRITICAL=95
-# DISK_THRESHOLD_WARNING=80
-# DISK_THRESHOLD_CRITICAL=90
+CPU_THRESHOLD_CRITICAL=95
+CPU_THRESHOLD_WARNING=80
+MEMORY_THRESHOLD_WARNING=85
+MEMORY_THRESHOLD_CRITICAL=95
+DISK_THRESHOLD_WARNING=80
+DISK_THRESHOLD_CRITICAL=90
 
 # 应用阈值
-# ERROR_RATE_THRESHOLD=0.05  # 5% 错误率
-# LATENCY_P95_THRESHOLD=1.0  # 1 秒
-# LATENCY_P99_THRESHOLD=5.0  # 5 秒
+LATENCY_P95_THRESHOLD=1.0  # 1 秒
+LATENCY_P99_THRESHOLD=5.0  # 5 秒
+ERROR_RATE_THRESHOLD=0.05  # 5% 错误率
 
 # ML 模型阈值
-# MODEL_ACCURACY_THRESHOLD=0.85
-# DRIFT_SCORE_THRESHOLD=0.5
-# INFERENCE_LATENCY_P99_THRESHOLD=0.5  # 500 毫秒
-# LOW_CONFIDENCE_THRESHOLD=0.7
+MODEL_ACCURACY_THRESHOLD=0.85
+DRIFT_SCORE_THRESHOLD=0.5
+INFERENCE_LATENCY_P99_THRESHOLD=0.5  # 500 毫秒
+LOW_CONFIDENCE_THRESHOLD=0.7
 
 
 # =============================================================================
@@ -170,19 +170,19 @@
 # 适用于灰度发布
 
 # 启用指标采集
-# ENABLE_METRICS=true
+ENABLE_METRICS=true
 
 # 启用日志传输
-# ENABLE_LOGGING=true
+ENABLE_LOGGING=true
 
 # 启用告警
-# ENABLE_ALERTING=true
+ENABLE_ALERTING=true
 
 # 启用漂移检测
-# ENABLE_DRIFT_DETECTION=true
+ENABLE_DRIFT_DETECTION=true
 
 # 启用性能监控
-# ENABLE_PERFORMANCE_MONITORING=true
+ENABLE_PERFORMANCE_MONITORING=true
 
 
 # =============================================================================
@@ -193,13 +193,13 @@
 # 仅在 development 环境使用
 
 # 启用调试模式
-# DEBUG=false
+DEBUG=false
 
 # 模拟外部服务
-# MOCK_EXTERNAL_SERVICES=false
+MOCK_EXTERNAL_SERVICES=false
 
 # 使用本地存储替代云存储
-# USE_LOCAL_STORAGE=true
+USE_LOCAL_STORAGE=true
 
 
 # =============================================================================
