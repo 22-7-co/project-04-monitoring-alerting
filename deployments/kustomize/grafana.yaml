@@ -87,6 +87,8 @@ spec:
                   items:
                     - key: ml-api-overview.json
                       path: ml-api-overview.json
+                    - key: node-infrastructure.json
+                      path: node-infrastructure.json
         - name: data
           persistentVolumeClaim:
             claimName: grafana-data

@@ -17,18 +17,77 @@ rule_files:
   - /etc/prometheus/alerts.yml
 
 scrape_configs:
+  # Prometheus / Alertmanager：经 Endpoints 自动发现（多副本或多节点时无需改配置）
   - job_name: prometheus
-    static_configs:
-      - targets: ["localhost:9090"]
-        labels:
-          instance: prometheus-server
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - monitoring-stack
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: prometheus
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: http
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: kubernetes_node
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: instance
 
+  - job_name: alertmanager
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - monitoring-stack
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: alertmanager
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: http
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: kubernetes_node
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: instance
+
+  # 节点指标：每个 node-exporter Pod（DaemonSet）一条目标；instance = 节点名
   - job_name: node-exporter
-    static_configs:
-      - targets: ["node-exporter:9100"]
-        labels:
-          instance: main-server
-          role: ml-infrastructure
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - monitoring-stack
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: node-exporter
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: http
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: kubernetes_node
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: instance
+      - target_label: role
+        replacement: ml-infrastructure
 
   - job_name: kubernetes-ml-api-pods
     metrics_path: /metrics
@@ -60,12 +119,8 @@ scrape_configs:
         source_labels: [__meta_kubernetes_pod_name]
         target_label: kubernetes_pod_name
       - action: replace
-        source_labels: [__meta_kubernetes_pod_name]
-        regex: (.+)
-        target_label: service
-        replacement: model-inference
+        source_labels: [__meta_kubernetes_node_name]
+        target_label: kubernetes_node
       - action: replace
-        source_labels: [__meta_kubernetes_pod_name]
-        regex: (.+)
-        target_label: model
-        replacement: resnet50
+        source_labels: [__meta_kubernetes_pod_label_app]
+        target_label: service

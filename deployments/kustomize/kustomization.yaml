@@ -29,6 +29,7 @@ configMapGenerator:
   - name: grafana-dashboard-ml-api
     files:
       - ml-api-overview.json=../../platform/observability/grafana/dashboards/ml-api-overview.json
+      - node-infrastructure.json=../../platform/observability/grafana/dashboards/node-infrastructure.json
   - name: filebeat-config
     files:
       - filebeat.yml=../../platform/logging/filebeat/filebeat-k8s.yml

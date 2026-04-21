@@ -52,7 +52,7 @@ groups:
       - alert: HighCPUUsage
         expr: |
           100 - (avg by (instance) (
-            rate(node_cpu_seconds_total{mode="idle"}[5m])
+            rate(node_cpu_seconds_total{job="node-exporter",mode="idle"}[5m])
           ) * 100) > 80
         for: 5m
         labels:
@@ -84,8 +84,8 @@ groups:
       - alert: HighMemoryUsage
         expr: |
           (1 - (
-            node_memory_MemAvailable_bytes /
-            node_memory_MemTotal_bytes
+            node_memory_MemAvailable_bytes{job="node-exporter"} /
+            node_memory_MemTotal_bytes{job="node-exporter"}
           )) * 100 > 85
         for: 5m
         labels:
@@ -94,9 +94,8 @@ groups:
         annotations:
           summary: "{{ $labels.instance }} 内存使用率过高"
           description: |
-            内存使用率为 {{ $value | humanizePercentage }}。
-            可用内存：{{ query "node_memory_MemAvailable_bytes" | first | value | humanize1024 }}B
-            总内存：{{ query "node_memory_MemTotal_bytes" | first | value | humanize1024 }}B
+            实例 {{ $labels.instance }} 估算内存使用率约 {{ $value | humanize }}%（阈值 85%，持续 5m）。
+            请结合 Grafana「主机资源监控」看板与节点负载排查。
 
 
       # -----------------------------------------------------------------------
@@ -108,8 +107,10 @@ groups:
       #
       - alert: LowDiskSpace
         expr: |
-          (node_filesystem_avail_bytes{mountpoint="/"} /
-           node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+          min by (instance) (
+            (node_filesystem_avail_bytes{job="node-exporter",mountpoint="/"} /
+             node_filesystem_size_bytes{job="node-exporter",mountpoint="/"}) * 100
+          ) < 15
         for: 5m
         labels:
           severity: critical
@@ -117,10 +118,8 @@ groups:
         annotations:
           summary: "{{ $labels.instance }} 磁盘空间不足"
           description: |
-            {{ $labels.mountpoint }} 的剩余磁盘空间为 {{ $value | humanizePercentage }}。
-            可用：{{ query "node_filesystem_avail_bytes{mountpoint='/'}" | first | value | humanize1024 }}B
-            总量：{{ query "node_filesystem_size_bytes{mountpoint='/'}" | first | value | humanize1024 }}B
-            处理建议：立即清理日志或扩容存储。
+            实例 {{ $labels.instance }} 根挂载点可用空间比例约 {{ $value | humanize }}%（低于 15% 触发）。
+            处理建议：清理日志或扩容存储；详见 Grafana 磁盘面板。
 
 
       # -----------------------------------------------------------------------
