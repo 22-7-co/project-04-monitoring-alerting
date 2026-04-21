@@ -371,7 +371,7 @@ def test_data_drift_metric():
     pytest.importorskip("scipy")
     pytest.importorskip("flask")
     pytest.importorskip("psutil")
-    from custom_metrics import DataDriftDetector
+    from custom_metrics import DataDriftDetector, DriftDetectionResult
     #
     # 创建检测器
     reference_data = np.random.normal(0, 1, (1000, 1))
@@ -384,8 +384,9 @@ def test_data_drift_metric():
     # 导出漂移指标
     detector.export_drift_metrics(results)
     #
-    assert isinstance(results, dict)
+    assert isinstance(results, list)
     assert len(results) == 1
+    assert isinstance(results[0], DriftDetectionResult)
 
 
 
