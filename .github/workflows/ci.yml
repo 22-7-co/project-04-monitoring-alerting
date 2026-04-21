@@ -11,7 +11,7 @@ jobs:
     name: Kustomize build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: azure/setup-kubectl@v4
         with:
           version: v1.29.14
@@ -25,7 +25,7 @@ jobs:
     name: Pytest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -38,7 +38,7 @@ jobs:
     name: Shellcheck (ops scripts)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install shellcheck
         run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
       - name: Run shellcheck
