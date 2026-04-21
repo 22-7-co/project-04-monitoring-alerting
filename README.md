@@ -17,6 +17,15 @@
 - `deployments/kustomize/`：Kubernetes 资源清单
 - `ops/scripts/`：一键上架/下架脚本
 - `docs/production-simulation.md`：部署与排障说明
+- `docs/requirements-matrix.md`：FR 与仓库实现对照（验收以本仓库 K8s 为准时必读）
+- `docs/monitoring-project-readiness-plan.md`：企业向完善计划（含各阶段成功标准）
+- `docs/interview-orals/`：面试常见问题与口述要点（计划第 7 点）
+- `docs/runbooks/`：告警 Runbook 与 Alertmanager 通知路径说明
+- `docs/production-hardening-notes.md`：生产加固对照（学习栈 vs 生产）
+- `docs/operations-assumptions.md`：资源、弹性、数据与 RPO/RTO 假设
+- `docs/slo-and-observability-depth.md`：SLO 与告警分层（文档深化）
+
+变更监控相关清单或规则时，请同步更新 `docs/requirements-matrix.md` 对应行。
 
 ## 一键上架
 
@@ -51,6 +60,7 @@ SKIP_BUILD=1 ./ops/scripts/k8s-up.sh
 快速检查：
 
 ```bash
+kubectl -n monitoring-stack get pods -o wide           
 kubectl -n monitoring-stack get svc
 curl -s http://127.0.0.1:30500/health
 ```

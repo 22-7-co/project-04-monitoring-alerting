@@ -1,3 +1,20 @@
+# Alertmanager：路由与接收端。
+# 通知链：Prometheus 规则 firing → POST Alertmanager /api/v2/alerts → 本文件 route → receivers。
+#
+# Webhook 示例（勿将真实 URL/Token 提交到 Git；调试可用 https://webhook.site 等）：
+#
+# receivers:
+#   - name: default
+#   - name: webhook_debug
+#     webhook_configs:
+#       - url: "https://example.com/alert-webhook"
+#         send_resolved: true
+#
+# route:
+#   receiver: webhook_debug
+#
+# 完整步骤与 JSON 字段说明见 docs/runbooks/README.md
+
 global:
   resolve_timeout: 5m
 

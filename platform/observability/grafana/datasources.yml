@@ -7,12 +7,16 @@ datasources:
     uid: prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus:9090
+    # 使用完整 Service DNS，避免部分环境下短名解析异常
+    url: http://prometheus.monitoring-stack.svc.cluster.local:9090
     isDefault: true
     editable: true
     jsonData:
       timeInterval: "15s"
-      httpMethod: POST
+      # POST + 大范围 query_range 在 Prometheus 内存紧张时易被对端掐断（EOF）；GET 更稳
+      httpMethod: GET
+      # 秒（字符串）：Grafana 代理等待 Prometheus 响应的上限
+      timeout: "120"
 
   - name: Elasticsearch
     uid: elasticsearch

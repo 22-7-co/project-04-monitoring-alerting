@@ -6,6 +6,23 @@
 
 ---
 
+## 实现形态与验收说明（仓库 SSOT）
+
+本仓库**当前交付形态**为：**Kubernetes（命名空间 `monitoring-stack`）+ Kustomize**，不包含 Docker Compose 清单。
+
+| 维度 | 以何为准 |
+|------|----------|
+| 上架/下架与前置条件 | [README.md](README.md)、[docs/production-simulation.md](docs/production-simulation.md) |
+| 清单入口 | [deployments/kustomize/kustomization.yaml](deployments/kustomize/kustomization.yaml) |
+| 需求与实现对照 | [docs/requirements-matrix.md](docs/requirements-matrix.md) |
+| 企业向迭代计划 | [docs/monitoring-project-readiness-plan.md](docs/monitoring-project-readiness-plan.md) |
+
+正文各节中出现的 **「Docker Compose」「localhost:9090」** 等表述，源自**课程原始需求文档**，表示能力诉求的等价描述：在本仓库中由 **K8s Deployment/Service、NodePort 或集群内 DNS** 等实现。验收时请勿在仓库内查找 `docker-compose.yml`。
+
+**变更约定**：修改监控采集、告警规则或上架行为时，请同步更新 [docs/requirements-matrix.md](docs/requirements-matrix.md) 对应行，避免文档与代码分叉。
+
+---
+
 ## 功能需求
 
 ### FR-1：指标采集与存储
