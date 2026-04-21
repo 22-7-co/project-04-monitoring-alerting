@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, master]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   kustomize:
     name: Kustomize build
@@ -18,7 +21,7 @@ jobs:
           curl -fsSL -o kubectl "https://dl.k8s.io/release/v1.29.14/bin/linux/amd64/kubectl"
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/kubectl
-          kubectl version --client --short
+          kubectl version --client
       - name: kubectl kustomize (matches production-simulation.md)
         run: |
           set -euo pipefail
@@ -30,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install test dependencies
