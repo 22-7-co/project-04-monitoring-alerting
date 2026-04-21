@@ -12,9 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: azure/setup-kubectl@v4
-        with:
-          version: v1.29.14
+      - name: Install kubectl v1.29.14
+        run: |
+          set -euo pipefail
+          curl -fsSL -o kubectl "https://dl.k8s.io/release/v1.29.14/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client --short
       - name: kubectl kustomize (matches production-simulation.md)
         run: |
           set -euo pipefail
