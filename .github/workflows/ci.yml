@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  kustomize:
+    name: Kustomize build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: v1.29.14
+      - name: kubectl kustomize (matches production-simulation.md)
+        run: |
+          set -euo pipefail
+          kubectl kustomize deployments/kustomize --load-restrictor LoadRestrictionsNone >/tmp/rendered.yaml
+          test -s /tmp/rendered.yaml
+
+  pytest:
+    name: Pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: pip install pytest prometheus_client
+      - name: Run tests
+        run: pytest tests/ -v
+
+  shellcheck:
+    name: Shellcheck (ops scripts)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
+      - name: Run shellcheck
+        run: shellcheck ops/scripts/*.sh
